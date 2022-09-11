@@ -1,5 +1,5 @@
 {
-  "app": "../gradlew run -DmainClass=testcontainerscloud.controlplane.infrastructure.InfrastructureApp",
+  "app": "../gradlew run -DmainClass=io.ilopezluna.infrastructure.InfrastructureApp",
   "watch": {
     "include": [
       "**"

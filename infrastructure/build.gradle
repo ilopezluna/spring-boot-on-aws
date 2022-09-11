@@ -7,6 +7,10 @@ plugins {
     id 'maven-publish'
 }
 
+apply plugin: "application"
+
+mainClassName = System.getProperty("mainClass")
+
 description = 'infrastructure'
 group = 'io.ilopezluna.infrastructure'
 version = '0.0.1-SNAPSHOT'
