@@ -21,7 +21,7 @@ public class InfrastructureStack extends Stack {
         super(scope, id, props);
 
         Vpc vpc = Vpc.Builder.create(this, prefixName("VPC"))
-            .maxAzs(1)  // Default is all AZs in region
+            .maxAzs(2)  // Default is all AZs in region
             .build();
 
         Cluster cluster = Cluster.Builder.create(this, prefixName("Cluster"))
