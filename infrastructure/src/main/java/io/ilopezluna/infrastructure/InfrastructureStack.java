@@ -7,6 +7,7 @@ import software.amazon.awscdk.services.ecs.Cluster;
 import software.amazon.awscdk.services.ecs.ContainerImage;
 import software.amazon.awscdk.services.ecs.patterns.ApplicationLoadBalancedFargateService;
 import software.amazon.awscdk.services.ecs.patterns.ApplicationLoadBalancedTaskImageOptions;
+import software.amazon.awscdk.services.elasticloadbalancingv2.HealthCheck;
 import software.constructs.Construct;
 
 public class InfrastructureStack extends Stack {
@@ -20,15 +21,15 @@ public class InfrastructureStack extends Stack {
     public InfrastructureStack(final Construct scope, final String id, final StackProps props) {
         super(scope, id, props);
 
-        Vpc vpc = Vpc.Builder.create(this, prefixName("VPC"))
+        final Vpc vpc = Vpc.Builder.create(this, prefixName("VPC"))
             .maxAzs(2)  // Default is all AZs in region
             .build();
 
-        Cluster cluster = Cluster.Builder.create(this, prefixName("Cluster"))
+        final Cluster cluster = Cluster.Builder.create(this, prefixName("Cluster"))
             .vpc(vpc).build();
 
         // Create a load-balanced Fargate service and make it public
-        ApplicationLoadBalancedFargateService.Builder.create(this, prefixName("FargateService"))
+        final ApplicationLoadBalancedFargateService fargateService = ApplicationLoadBalancedFargateService.Builder.create(this, prefixName("FargateService"))
             .cluster(cluster)           // Required
             .cpu(256)                   // Default is 256
             .desiredCount(1)            // Default is 1
@@ -39,6 +40,15 @@ public class InfrastructureStack extends Stack {
             .memoryLimitMiB(512)       // Default is 512
             .publicLoadBalancer(true)   // Default is false
             .build();
+
+        // Configure health check
+        fargateService.getTargetGroup().configureHealthCheck(HealthCheck.builder()
+            .healthyHttpCodes("200") // Specify which http codes are considered healthy
+            // The load balancer REQUIRES a healthcheck endpoint to determine the state of the app.
+            // In this example, we're using the Spring Actuator. Configure this in your app if missing.
+            .path("/actuator/health")
+            .port("8080") // The default is port 80
+            .build());
     }
 
     private static String prefixName(String name) {
