@@ -36,6 +36,7 @@ public class InfrastructureStack extends Stack {
             .taskImageOptions(
                 ApplicationLoadBalancedTaskImageOptions.builder()
                     .image(ContainerImage.fromAsset("../application"))
+                    .containerPort(8080)    // The default is port 80, The Spring boot default port is 8080
                     .build())
             .memoryLimitMiB(512)       // Default is 512
             .publicLoadBalancer(true)   // Default is false
