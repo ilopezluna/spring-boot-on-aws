@@ -40,11 +40,15 @@ public class DatabaseConfig {
 
                 // Needed since Hikari reads properties directly
                 final Properties properties = new Properties();
-                properties.setProperty("spring.datasource.url", "jdbc:postgresql://%s:%s/%s".formatted(
+                final String url = "jdbc:postgresql://%s:%s/%s".formatted(
                     dbCredentials.getString("host"),
                     dbCredentials.getString("port"),
                     dbCredentials.getString("dbname")
-                ));
+                );
+
+                log.info("The URL for the Database is: %s".formatted(url));
+
+                properties.setProperty("spring.datasource.url", url);
                 properties.setProperty("spring.datasource.username", dataSourceProperties.getUsername());
                 properties.setProperty("spring.datasource.password", dataSourceProperties.getPassword());
                 environment.getPropertySources().addFirst(new PropertiesPropertySource("aws-custom-datasource-properties", properties));

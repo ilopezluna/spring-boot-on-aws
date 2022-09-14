@@ -3,9 +3,11 @@ package io.ilopezluna.infrastructure;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
+import software.amazon.awscdk.services.ec2.ISecurityGroup;
 import software.amazon.awscdk.services.ec2.InstanceClass;
 import software.amazon.awscdk.services.ec2.InstanceSize;
 import software.amazon.awscdk.services.ec2.InstanceType;
+import software.amazon.awscdk.services.ec2.Port;
 import software.amazon.awscdk.services.ec2.SubnetSelection;
 import software.amazon.awscdk.services.ec2.Vpc;
 import software.amazon.awscdk.services.ecs.Cluster;
@@ -21,17 +23,16 @@ import software.amazon.awscdk.services.rds.DatabaseCluster;
 import software.amazon.awscdk.services.rds.DatabaseClusterEngine;
 import software.amazon.awscdk.services.rds.DatabaseSecret;
 import software.amazon.awscdk.services.rds.DatabaseSecretProps;
-import software.amazon.awscdk.services.rds.Endpoint;
 import software.amazon.awscdk.services.rds.IClusterEngine;
 import software.amazon.awscdk.services.rds.InstanceProps;
 import software.constructs.Construct;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class InfrastructureStack extends Stack {
 
     private final static String PREFIX = "ilopezluna";
+    private final static int DB_PORT = 5432;
 
     public InfrastructureStack(final Construct scope, final String id) {
         this(scope, id, null);
@@ -77,6 +78,13 @@ public class InfrastructureStack extends Stack {
             .path("/actuator/health")
             .port("8080") // The default is port 80
             .build());
+
+        // These SecurityGroups are created during deployment (not during tests)
+        if (fargateService.getCluster().getConnections().getSecurityGroups().size() > 0) {
+            final ISecurityGroup fargateServiceSecurityGroup = fargateService.getCluster().getConnections().getSecurityGroups().get(0);
+            final ISecurityGroup dbSecurityGroup = dbCluster.getConnections().getSecurityGroups().get(0);
+            dbSecurityGroup.addIngressRule(fargateServiceSecurityGroup, Port.tcp(DB_PORT), "Give access to FargateService");
+        }
     }
 
     @NotNull
@@ -94,6 +102,7 @@ public class InfrastructureStack extends Stack {
             .engine(dbEngine)
             .credentials(credentials)
             .defaultDatabaseName("dbName")
+            .port(DB_PORT)
             .instanceProps(InstanceProps.builder()
                 .instanceType(InstanceType.of(InstanceClass.T3, InstanceSize.MEDIUM))
                 .vpc(vpc)
