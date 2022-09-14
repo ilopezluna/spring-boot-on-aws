@@ -79,12 +79,7 @@ public class InfrastructureStack extends Stack {
             .port("8080") // The default is port 80
             .build());
 
-        // These SecurityGroups are created during deployment (not during tests)
-        if (fargateService.getCluster().getConnections().getSecurityGroups().size() > 0) {
-            final ISecurityGroup fargateServiceSecurityGroup = fargateService.getCluster().getConnections().getSecurityGroups().get(0);
-            final ISecurityGroup dbSecurityGroup = dbCluster.getConnections().getSecurityGroups().get(0);
-            dbSecurityGroup.addIngressRule(fargateServiceSecurityGroup, Port.tcp(DB_PORT), "Give access to FargateService");
-        }
+        fargateService.getCluster().getConnections().allowTo(dbCluster, Port.tcp(DB_PORT));
     }
 
     @NotNull
