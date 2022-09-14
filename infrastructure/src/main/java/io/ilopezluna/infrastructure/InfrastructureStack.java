@@ -57,7 +57,6 @@ public class InfrastructureStack extends Stack {
         Endpoint clusterEndpoint = dbCluster.getClusterEndpoint();
         final Map<String, String> envVariables = new HashMap<>();
         envVariables.put("SPRING_DATASOURCE_URL", clusterEndpoint.getHostname());
-        envVariables.put("SPRING_DATASOURCE_USERNAME", "dbUser");
 
         // Create a load-balanced Fargate service and make it public
         final ApplicationLoadBalancedFargateService fargateService = ApplicationLoadBalancedFargateService.Builder.create(this, prefixName("FargateService"))
@@ -69,7 +68,7 @@ public class InfrastructureStack extends Stack {
                     .image(ContainerImage.fromAsset("../application"))
                     .containerPort(8080)    // The default is port 80, The Spring boot default port is 8080
                     .environment(envVariables)
-                    .secrets(Map.of("SPRING_DATASOURCE_PASSWORD", Secret.fromSecretsManager(databaseSecret)))
+                    .secrets(Map.of("DB_PASSWORD", Secret.fromSecretsManager(databaseSecret)))
                     .build())
             .memoryLimitMiB(512)       // Default is 512
             .publicLoadBalancer(true)   // Default is false
