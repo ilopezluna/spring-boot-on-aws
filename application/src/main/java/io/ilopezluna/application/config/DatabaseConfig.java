@@ -25,7 +25,7 @@ public class DatabaseConfig {
 
     private final ConfigurableEnvironment environment;
 
-    @Value("${spring.datasource.aws.database.secret}")
+    @Value("${spring.datasource.aws.db.credentials}")
     private String awsSecret;
 
     @Primary
@@ -40,6 +40,11 @@ public class DatabaseConfig {
 
                 // Needed since Hikari reads properties directly
                 final Properties properties = new Properties();
+                properties.setProperty("spring.datasource.url", "jdbc:postgresql://%s:%s/%s".formatted(
+                    dbCredentials.getString("host"),
+                    dbCredentials.getString("port"),
+                    dbCredentials.getString("dbname")
+                ));
                 properties.setProperty("spring.datasource.username", dataSourceProperties.getUsername());
                 properties.setProperty("spring.datasource.password", dataSourceProperties.getPassword());
                 environment.getPropertySources().addFirst(new PropertiesPropertySource("aws-custom-datasource-properties", properties));
