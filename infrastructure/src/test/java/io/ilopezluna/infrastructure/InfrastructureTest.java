@@ -19,6 +19,8 @@ public class InfrastructureTest {
         template.resourceCountIs("AWS::ECS::Service", 1);
         template.resourceCountIs("AWS::ECS::TaskDefinition", 1);
         template.resourceCountIs("AWS::ElasticLoadBalancingV2::LoadBalancer", 1);
+        template.resourceCountIs("AWS::ElasticLoadBalancingV2::LoadBalancer", 1);
+        template.resourceCountIs("AWS::RDS::DBCluster", 1);
 
         template.hasResourceProperties("AWS::EC2::VPC", Map.of(
             "Tags", Collections.singletonList(Map.of( "Value", "InfrastructureStack/ilopezlunaVPC"))

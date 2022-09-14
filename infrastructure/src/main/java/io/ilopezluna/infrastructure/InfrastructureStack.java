@@ -79,7 +79,7 @@ public class InfrastructureStack extends Stack {
             .port("8080") // The default is port 80
             .build());
 
-        fargateService.getCluster().getConnections().allowTo(dbCluster, Port.tcp(DB_PORT));
+        dbCluster.getConnections().allowFrom(fargateService.getService(), Port.tcp(DB_PORT));
     }
 
     @NotNull
