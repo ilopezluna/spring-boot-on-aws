@@ -3,7 +3,6 @@ package io.ilopezluna.infrastructure;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
-import software.amazon.awscdk.services.ec2.ISecurityGroup;
 import software.amazon.awscdk.services.ec2.InstanceClass;
 import software.amazon.awscdk.services.ec2.InstanceSize;
 import software.amazon.awscdk.services.ec2.InstanceType;
@@ -79,6 +78,7 @@ public class InfrastructureStack extends Stack {
             .port("8080") // The default is port 80
             .build());
 
+        // Allow ingress from Fargate to RDS (add a rule in the RDS security group)
         dbCluster.getConnections().allowFrom(fargateService.getService(), Port.tcp(DB_PORT));
     }
 

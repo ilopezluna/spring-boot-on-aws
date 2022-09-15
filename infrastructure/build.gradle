@@ -24,8 +24,8 @@ repositories {
 }
 
 dependencies {
-    implementation 'software.amazon.awscdk:aws-cdk-lib:2.40.0'
-    implementation 'software.constructs:constructs:10.1.94'
+    implementation 'software.amazon.awscdk:aws-cdk-lib:2.41.0'
+    implementation 'software.constructs:constructs:10.1.98'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
 }
 

@@ -40,3 +40,5 @@ out/
 build
 
 .DS_Store
+
+infrastructure/cdk.out
