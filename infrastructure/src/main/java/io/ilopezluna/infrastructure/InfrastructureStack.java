@@ -13,8 +13,7 @@ import software.amazon.awscdk.services.ec2.SubnetSelection;
 import software.amazon.awscdk.services.ec2.Vpc;
 import software.amazon.awscdk.services.ecs.Cluster;
 import software.amazon.awscdk.services.ecs.ContainerImage;
-import software.amazon.awscdk.services.ecs.CpuUtilizationScalingProps;
-import software.amazon.awscdk.services.ecs.MemoryUtilizationScalingProps;
+import software.amazon.awscdk.services.ecs.RequestCountScalingProps;
 import software.amazon.awscdk.services.ecs.ScalableTaskCount;
 import software.amazon.awscdk.services.ecs.Secret;
 import software.amazon.awscdk.services.ecs.patterns.ApplicationLoadBalancedFargateService;
@@ -93,12 +92,18 @@ public class InfrastructureStack extends Stack {
             .minCapacity(1)
             .maxCapacity(3)
             .build());
+        scalableTarget.scaleOnRequestCount("RequestScaling", RequestCountScalingProps.builder()
+            .requestsPerTarget(100)
+            .targetGroup(fargateService.getTargetGroup())
+            .build());
+        /*
         scalableTarget.scaleOnCpuUtilization("CpuScaling", CpuUtilizationScalingProps.builder()
             .targetUtilizationPercent(50)
             .build());
         scalableTarget.scaleOnMemoryUtilization("MemoryScaling", MemoryUtilizationScalingProps.builder()
             .targetUtilizationPercent(50)
             .build());
+            */
     }
 
     @NotNull
