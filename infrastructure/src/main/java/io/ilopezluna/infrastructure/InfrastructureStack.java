@@ -3,6 +3,7 @@ package io.ilopezluna.infrastructure;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
+import software.amazon.awscdk.services.applicationautoscaling.EnableScalingProps;
 import software.amazon.awscdk.services.ec2.InstanceClass;
 import software.amazon.awscdk.services.ec2.InstanceSize;
 import software.amazon.awscdk.services.ec2.InstanceType;
@@ -11,6 +12,9 @@ import software.amazon.awscdk.services.ec2.SubnetSelection;
 import software.amazon.awscdk.services.ec2.Vpc;
 import software.amazon.awscdk.services.ecs.Cluster;
 import software.amazon.awscdk.services.ecs.ContainerImage;
+import software.amazon.awscdk.services.ecs.CpuUtilizationScalingProps;
+import software.amazon.awscdk.services.ecs.MemoryUtilizationScalingProps;
+import software.amazon.awscdk.services.ecs.ScalableTaskCount;
 import software.amazon.awscdk.services.ecs.Secret;
 import software.amazon.awscdk.services.ecs.patterns.ApplicationLoadBalancedFargateService;
 import software.amazon.awscdk.services.ecs.patterns.ApplicationLoadBalancedTaskImageOptions;
@@ -74,12 +78,23 @@ public class InfrastructureStack extends Stack {
             .healthyHttpCodes("200") // Specify which http codes are considered healthy
             // The load balancer REQUIRES a healthcheck endpoint to determine the state of the app.
             // In this example, we're using the Spring Actuator. Configure this in your app if missing.
-            .path("/actuator/health")
+            .path("/actuator/info")
             .port("8080") // The default is port 80
             .build());
 
         // Allow ingress from Fargate to RDS (add a rule in the RDS security group)
         dbCluster.getConnections().allowFrom(fargateService.getService(), Port.tcp(DB_PORT));
+
+        final ScalableTaskCount scalableTarget = fargateService.getService().autoScaleTaskCount(EnableScalingProps.builder()
+            .minCapacity(1)
+            .maxCapacity(3)
+            .build());
+        scalableTarget.scaleOnCpuUtilization("CpuScaling", CpuUtilizationScalingProps.builder()
+            .targetUtilizationPercent(50)
+            .build());
+        scalableTarget.scaleOnMemoryUtilization("MemoryScaling", MemoryUtilizationScalingProps.builder()
+            .targetUtilizationPercent(50)
+            .build());
     }
 
     @NotNull
