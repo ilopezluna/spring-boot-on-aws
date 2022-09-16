@@ -20,8 +20,8 @@ public class Application {
     public CommandLineRunner demo(NoteRepository repository) {
         return (args) -> {
             // save a few customers
-            repository.save(new Note(1L, "first note"));
-            repository.save(new Note(2L, "second note"));
+            repository.save(new Note(1L, "First note"));
+            repository.save(new Note(2L, "Second note"));
         };
     }
 }
