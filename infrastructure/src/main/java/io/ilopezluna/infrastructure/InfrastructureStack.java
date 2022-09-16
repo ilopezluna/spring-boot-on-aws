@@ -79,7 +79,7 @@ public class InfrastructureStack extends Stack {
             // The load balancer REQUIRES a healthcheck endpoint to determine the state of the app.
             // In this example, we're using the Spring Actuator. Configure this in your app if missing.
             .path("/actuator/info")
-            .port("8080") // The default is port 80
+            .port("80") // The default is port 80
             .build());
 
         // Allow ingress from Fargate to RDS (add a rule in the RDS security group)
