@@ -1,6 +1,7 @@
 package io.ilopezluna.infrastructure;
 
 import org.jetbrains.annotations.NotNull;
+import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
 import software.amazon.awscdk.services.applicationautoscaling.EnableScalingProps;
@@ -75,11 +76,14 @@ public class InfrastructureStack extends Stack {
 
         // Configure health check
         fargateService.getTargetGroup().configureHealthCheck(HealthCheck.builder()
-            .healthyHttpCodes("200") // Specify which http codes are considered healthy
             // The load balancer REQUIRES a healthcheck endpoint to determine the state of the app.
-            // In this example, we're using the Spring Actuator. Configure this in your app if missing.
+            .healthyHttpCodes("200")
             .path("/actuator/info")
-            .port("80") // The default is port 80
+            .port("8080") // The port that the load balancer uses when performing health checks on the targets.
+            .interval(Duration.seconds(15))
+            .timeout(Duration.seconds(5))
+            .healthyThresholdCount(2)
+            .unhealthyThresholdCount(5)
             .build());
 
         // Allow ingress from Fargate to RDS (add a rule in the RDS security group)
