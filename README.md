@@ -9,15 +9,14 @@ The project is based in https://github.com/enghwa/springboot-fargate-cdk
 
 ## How to run it?
 
-Run the DB:
+Set the environment (DB):
 ```
-% docker run -e POSTGRES_PASSWORD=example -e POSTGRES_USER=example -e POSTGRES_DB=example -p 5432:5432 postgres:14-alpine
+% docker compose up
 ```
 
 Run the application:
 ```
-% cd application/
-% ../gradlew bootRun
+% ./gradlew bootRun
 ```
 
 ## How to deploy it?
