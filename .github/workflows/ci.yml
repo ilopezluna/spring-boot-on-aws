@@ -19,5 +19,5 @@ jobs:
                     ./gradlew build --no-daemon
                     echo "Example of custom env var with default value: $CUSTOM_ENV"
                 env: 
-                    CUSTOM_ENV: ${{ github.event.release.tag_name || "latest" }}
+                    CUSTOM_ENV: ${{ github.event.release.tag_name || 'latest' }}
 
