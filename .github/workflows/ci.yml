@@ -14,4 +14,10 @@ jobs:
                     java-version: '17'
                     distribution: 'temurin'
                     cache: 'gradle'
-            -   run: ./gradlew build --no-daemon
+            -   name: Build
+                run: |
+                    ./gradlew build --no-daemon
+                    echo "Example of custom env var with default value: $CUSTOM_ENV"
+                env: 
+                    CUSTOM_ENV: ${{ github.event.release.tag_name || 'latest' }}
+
